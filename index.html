@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Master Club</title>
+
+<style>
+body{
+margin:0;
+padding:0;
+font-family:Arial, sans-serif;
+background:#0f0f1a;
+color:white;
+text-align:center;
+}
+
+/* Header */
+.header{
+background:#1c1c2e;
+padding:15px;
+font-size:22px;
+font-weight:bold;
+color:gold;
+}
+
+/* Cards */
+.card{
+background:#1c1c2e;
+margin:10px;
+padding:15px;
+border-radius:15px;
+box-shadow:0 0 10px rgba(0,0,0,0.4);
+}
+
+/* Balance */
+#balance{
+font-size:20px;
+color:#00ff88;
+}
+
+/* Timer */
+#timer{
+font-size:45px;
+color:gold;
+}
+
+/* Buttons */
+button{
+padding:12px 18px;
+margin:6px;
+border:none;
+border-radius:10px;
+font-size:16px;
+color:white;
+cursor:pointer;
+}
+
+.green{background:green;}
+.red{background:red;}
+.violet{background:purple;}
+.betbtn{background:#333;}
+.resetbtn{background:#ff8800;}
+
+/* Info text */
+#choice, #bet{
+font-size:16px;
+margin-top:8px;
+color:#ccc;
+}
+
+/* Result */
+#result{
+font-size:22px;
+margin-top:10px;
+font-weight:bold;
+}
+
+/* History */
+.history{
+background:#1c1c2e;
+margin:10px;
+padding:10px;
+border-radius:12px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+MASTER CLUB
+</div>
+
+<div class="card">
+<h2 id="balance">Balance: ₹1000</h2>
+<button class="resetbtn" onclick="resetBalance()">Reset</button>
+</div>
+
+<div class="card">
+<div id="period">Period: 10001</div>
+<div id="timer">10</div>
+</div>
+
+<div class="card">
+<h3>Select Bet</h3>
+<button class="betbtn" onclick="setBet(10)">₹10</button>
+<button class="betbtn" onclick="setBet(50)">₹50</button>
+<button class="betbtn" onclick="setBet(100)">₹100</button>
+<div id="bet">Selected Bet: ₹0</div>
+</div>
+
+<div class="card">
+<button class="green" onclick="predict('GREEN')">GREEN</button>
+<button class="red" onclick="predict('RED')">RED</button>
+<button class="violet" onclick="predict('VIOLET')">VIOLET</button>
+
+<div id="choice">No Prediction Selected</div>
+<div id="result"></div>
+</div>
+
+<div class="history">
+<h3>Result History</h3>
+<div id="history"></div>
+</div>
+
+<script>
+
+let period = 10001;
+let timer = 10;
+let choice = "";
+let history = [];
+
+let balance = parseInt(localStorage.getItem("balance")) || 1000;
+let betAmount = 0;
+
+document.getElementById("balance").innerText =
+"Balance: ₹" + balance;
+
+function resetBalance(){
+balance = 1000;
+localStorage.setItem("balance", balance);
+document.getElementById("balance").innerText =
+"Balance: ₹" + balance;
+}
+
+function setBet(amount){
+betAmount = amount;
+document.getElementById("bet").innerText =
+"Selected Bet: ₹" + amount;
+}
+
+function predict(color){
+choice = color;
+document.getElementById("choice").innerText =
+"Your Prediction: " + color;
+}
+
+function getResult(){
+let random = Math.floor(Math.random()*3);
+
+if(random===0) return "GREEN";
+if(random===1) return "RED";
+return "VIOLET";
+}
+
+setInterval(()=>{
+
+timer--;
+document.getElementById("timer").innerText = timer;
+
+if(timer===0){
+
+let result = getResult();
+
+if(choice===""){
+document.getElementById("result").innerHTML =
+"Result: " + result;
+}
+else if(choice===result){
+
+balance += betAmount;
+localStorage.setItem("balance", balance);
+
+document.getElementById("balance").innerText =
+"Balance: ₹" + balance;
+
+document.getElementById("result").innerHTML =
+"🎉 You Win! Result: " + result;
+}
+else{
+
+balance -= betAmount;
+localStorage.setItem("balance", balance);
+
+document.getElementById("balance").innerText =
+"Balance: ₹" + balance;
+
+document.getElementById("result").innerHTML =
+"❌ You Lose! Result: " + result;
+}
+
+history.unshift("Period " + period + " → " + result);
+
+if(history.length > 5){
+history.pop();
+}
+
+document.getElementById("history").innerHTML =
+history.join("<br>");
+
+period++;
+document.getElementById("period").innerText =
+"Period: " + period;
+
+timer = 10;
+choice = "";
+document.getElementById("choice").innerText =
+"No Prediction Selected";
+
+}
+
+},1000);
+
+</script>
+
+</body>
+</html>
